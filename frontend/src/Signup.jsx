@@ -4,19 +4,28 @@ import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 
 const Signup = () => {
-    const [name, setName] = useState()
+    const [firstName, setFirstName] = useState()
+    const [lastName, setLastName] = useState()
     const [email, setEmail] = useState()
     const [password, setPassword] = useState()
+    const [error, setError] = useState("")
     const navigate = useNavigate()
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        axios.post('http://localhost:3001/register', { name, email, password })
-            .then(result =>{ console.log(result)
+        axios.post('http://localhost:3001/api/register', { firstName, lastName, email, password })
+            .then(result => {
+                console.log(result)
 
                 navigate('/login')
             })
-            .catch(err => console.log(err))
+            .catch(err => {
+                if (err.response &&
+                    err.response.status >= 400 && err.response.status <= 500
+                ) {
+                    setError(error.response.data.message)
+                }
+            })
     }
 
     return (
@@ -28,15 +37,28 @@ const Signup = () => {
                 <form onSubmit={handleSubmit}>
                     <div className='mb-3'>
                         <label htmlFor='email'>
-                            <strong>Name</strong>
+                            <strong> First Name</strong>
                         </label>
                         <input
                             type='text'
                             placeholder='Enter Name'
                             autoComplete='off'
-                            name='email'
+                            name='firstName'
                             className='form-control rounded-0'
-                            onChange={(e) => setName(e.target.value)}
+                            onChange={(e) => setFirstName(e.target.value)}
+                        />
+                    </div>
+                    <div className='mb-3'>
+                        <label htmlFor='email'>
+                            <strong> Last Name</strong>
+                        </label>
+                        <input
+                            type='text'
+                            placeholder='Enter Name'
+                            autoComplete='off'
+                            name='lastName'
+                            className='form-control rounded-0'
+                            onChange={(e) => setLastName(e.target.value)}
                         />
                     </div>
                     <div className='mb-3'>
@@ -65,6 +87,9 @@ const Signup = () => {
                             onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
+                    {error && <div className='mb-3'>
+                        {error}
+                    </div>}
 
                     <button type='submit' className='btn btn-success w-100 rounded'>
                         Register

@@ -4,23 +4,32 @@ import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom'
 
 const Login = () => {
-    const [email, setEmail] = useState()
-    const [password, setPassword] = useState()
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
     const navigate = useNavigate()
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        axios.post('http://localhost:3001/login', { email, password })
+
+        if (!email || !password) {
+            alert("Please fill in both email and password");
+            return;
+        }
+
+        axios.post('http://localhost:3001/api/login', { email, password })
             .then(result => {
                 console.log(result)
 
-                if (result.data === "Success") {
+                if (result.data && result.data.message === "Logged in successfully") {
 
                     navigate('/home')
                 }
 
             })
-            .catch(err => console.log(err))
+            .catch(err => {
+                console.error('Login error:', err.response ? err.response.data : err);
+                alert("An error occurred. Please try again.");
+            })
     }
 
     return (
